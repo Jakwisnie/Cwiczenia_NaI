@@ -32,7 +32,7 @@ vector<double> hill_climbing(function<double(vector<double>)> f, function<bool(v
         auto p2 = p;
 
         p2[distrib(gen)] += distrib_r(gen);
-        if (!f_domain(p2))
+        if (f_domain(p2))
         {
             double y2 = f(p2);
             if (y2 < f(p))
