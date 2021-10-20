@@ -7,7 +7,7 @@
 
 using namespace std;
 
-random_device rd;  
+random_device rd;
 mt19937 gen(rd()); 
 
 ostream& operator<<(ostream& o, vector<double> v)
@@ -43,22 +43,24 @@ int main()
         return 100 - (v[0] * v[0] + v[1] * v[1]);
     };
 
-    auto matyas = [](vector<double> v) {
+    auto ackley = [](vector<double> v) {
         double x = v.at(0), y = v.at(1);
         return -20 * exp(-0.2 * sqrt(0.5 * (x * x + y * y))) - exp(0.5 * (cos(2 * M_PI * x) + cos(2 * M_PI * y))) + M_E + 20.0;
     };
 
-    auto matyas_domain = [](vector<double> v) {
+    auto ackley_domain = [](vector<double> v) {
         return (abs(v[0]) <= 5) && (abs(v[1]) <= 5);
     };
 
     uniform_real_distribution<> distrib_r(-5, 5);
-    vector<double> matyas_p0 = {
+    vector<double> ackley_p0 = {
         distrib_r(gen),
         distrib_r(gen),
     };
-    auto result =  hill_climbing(matyas, matyas_domain, matyas_p0, 10000);
-   cout << result << " -> " << matyas(result) << endl;
+
+ auto result = hill_climbing(ackley, ackley_domain, ackley_p0, 100000);
+ cout << result << " -> " << ackley(result) << endl;
+
 
     auto matyas = [](vector <double> v){
         double x = v.at(0),y= v.at(1);
