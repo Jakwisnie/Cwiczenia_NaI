@@ -46,12 +46,23 @@
         cin>>a;
 
         int b,c;
-        cout <<"Podaj pierwszy argument"<<endl;
-        cin>>b;
+      
         
-         cout <<"Podaj drugi argument"<<endl;
-        cin>>c;
+        while( b<=5 && b>=(-5) )
+{
+    cout <<"Podaj pierwszy argument"<<endl;
+        cin>>b;
+}
 
+   
+
+while( (c<=5 && c>=(-5)) )
+{
+    cout <<"Podaj drugi argument"<<endl;
+        cin>>c;
+}
+        
+         
 
 
         auto function1 = [](vector<double> v) {
@@ -95,7 +106,7 @@ if(a==1){
 else {
     if(a==2){
     auto result2 =  hill_climbing(himmelblau, himmelblau_domain, himmelblau_p0, 10000);
-    cout << result2 << " -> " << himmelblau(result) << endl;
+    cout << result2 << " -> " << himmelblau(result2) << endl;
     }
     else {
         cout <<" zly argument";
