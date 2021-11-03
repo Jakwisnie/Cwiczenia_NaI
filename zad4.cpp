@@ -7,28 +7,33 @@
 #include <tuple>
 #include <vector>
 
-using genotype_t = std::vector<char>;
-using population_t = std::vector<genotype_t>;
-using population_fitness_t = std::vector<double>;
+using namespace std;
 
+using genotype_t = vector<char>;
+using population_t = vector<genotype_t>;
+using population_fitness_t = vector<double>;
 
-std::random_device random_dev;
-std::default_random_engine random_engine(random_dev());
-std::uniform_real_distribution<double> double_random_dist(0.0, 1.0);
-std::uniform_int_distribution<char> rand_01(0, 1);
+random_device rd;
+mt19937 gen(rd());
+random_device random_dev;
+default_random_engine random_engine(random_dev());
+uniform_real_distribution<double> double_random_dist(0.0, 1.0);
+uniform_int_distribution<char> rand_01(0, 1);
 
-
-std::vector<int> selection_roulette(population_fitness_t fitnesses)
+vector<int> selection_roulette(population_fitness_t fitnesses)
 {
-    std::vector<int> ret;
-    double sum_fit = std::accumulate(fitnesses.begin(), fitnesses.end(), 0.0);
-    std::uniform_real_distribution<double> random_distr(0.0, sum_fit);
-    for (int j = 0; j < fitnesses.size(); j++) {
+    vector<int> ret;
+    double sum_fit = accumulate(fitnesses.begin(), fitnesses.end(), 0.0);
+    uniform_real_distribution<double> random_distr(0.0, sum_fit);
+    for (int j = 0; j < fitnesses.size(); j++)
+    {
         double rand_selected = random_distr(random_engine);
         double s = fitnesses[0];
         int selected_i = fitnesses.size() - 1;
-        for (int i = 0; i < fitnesses.size() - 1; i++) {
-            if (s > rand_selected) {
+        for (int i = 0; i < fitnesses.size() - 1; i++)
+        {
+            if (s > rand_selected)
+            {
                 selected_i = i;
                 break;
             }
@@ -40,7 +45,7 @@ std::vector<int> selection_roulette(population_fitness_t fitnesses)
     return ret;
 }
 
-std::pair<genotype_t, genotype_t> empty_crossover_f(genotype_t a, genotype_t b)
+pair<genotype_t, genotype_t> empty_crossover_f(genotype_t a, genotype_t b)
 {
     return {a, b};
 }
@@ -49,42 +54,46 @@ genotype_t empty_mutation_f(genotype_t a, double)
     return a;
 }
 
-
 population_t genetic_algorithm(
-    std::function<double(genotype_t)> fitnes_f,
+    function<double(genotype_t)> fitnes_f,
     const population_t init_population,
     double crossover_probability,
     double mutation_probability,
-    std::function<std::pair<genotype_t, genotype_t>(genotype_t, genotype_t)> crossover_f,
-    std::function<genotype_t(genotype_t, double)> mutation_f,
-    std::function<std::vector<int>(population_fitness_t)> select_f,
-    std::function<bool(population_t, population_fitness_t, int)> termination_cond = [](auto, auto, auto i) {
-        return i < 100;
-    })
+    function<pair<genotype_t, genotype_t>(genotype_t, genotype_t)> crossover_f,
+    function<genotype_t(genotype_t, double)> mutation_f,
+    function<vector<int>(population_fitness_t)> select_f,
+    function<bool(population_t, population_fitness_t, int)> termination_cond = [](auto, auto, auto i)
+    { return i < 100; })
 {
     int iteration = 0;
     population_t population = init_population;
     population_fitness_t population_fit;
-    for (auto& gene : population)
+    for (auto &gene : population)
         population_fit.push_back(fitnes_f(gene));
-    while (termination_cond(population, population_fit, iteration)) {
-        std::vector<int> parent_pop_i = select_f(population_fit);
+    while (termination_cond(population, population_fit, iteration))
+    {
+        vector<int> parent_pop_i = select_f(population_fit);
 
         population_t offspring_pop(parent_pop_i.size());
-        for (int i = 1; i < parent_pop_i.size(); i += 2) {
+        for (int i = 1; i < parent_pop_i.size(); i += 2)
+        {
             int parent_idx_0 = parent_pop_i[i - 1];
             int parent_idx_1 = parent_pop_i[i];
-            if (double_random_dist(random_engine) < crossover_probability) {
+            if (double_random_dist(random_engine) < crossover_probability)
+            {
                 auto [a, b] = crossover_f(population[parent_idx_0], population[parent_idx_1]);
                 offspring_pop[i - 1] = a;
                 offspring_pop[i] = b;
-            } else {
+            }
+            else
+            {
                 offspring_pop[i - 1] = population[parent_idx_0];
                 offspring_pop[i] = population[parent_idx_1];
             }
         }
 
-        for (int i = 0; i < parent_pop_i.size(); i++) {
+        for (int i = 0; i < parent_pop_i.size(); i++)
+        {
             offspring_pop[i] = mutation_f(offspring_pop[i], mutation_probability);
         }
 
@@ -98,34 +107,58 @@ population_t genetic_algorithm(
     return population;
 }
 
-
 /////// problem implementation
 
 double one_max(genotype_t gene)
 {
-    return std::accumulate(gene.begin(), gene.end(), 0.0);
+    return accumulate(gene.begin(), gene.end(), 0.0);
 }
 
 int main()
 {
+    auto function1 = [](vector<double> v)
+    {
+        return 100 - (v[0] * v[0] + v[1] * v[1]);
+    };
     population_t init_pop(10);
-    for (auto& p : init_pop) {
+    for (auto &p : init_pop)
+    {
         for (int i = 0; i < 20; i++)
             p.push_back(rand_01(random_engine));
     }
 
-    auto debug_term_cond = [](auto pop, auto fit, auto i) {
-        std::cout << i << ":";
-        for (auto e : fit) {
-            std::cout << " " << e;
+    auto debug_term_cond = [](auto pop, auto fit, auto i)
+    {
+        cout << i << ":";
+        for (auto e : fit)
+        {
+            cout << " " << e;
         }
-        std::cout << std::endl;
+        cout << endl;
         return i < 100;
     };
 
     auto result = genetic_algorithm(
         one_max,
         init_pop,
-        0.8, 0.001, empty_crossover_f, empty_mutation_f, selection_roulette,debug_term_cond);
+        0.8, 0.001, empty_crossover_f, empty_mutation_f, selection_roulette, debug_term_cond);
+    auto ackley = [](vector<double> v)
+    {
+        double x = v.at(0), y = v.at(1);
+        return -20 * exp(-0.2 * sqrt(0.5 * (x * x + y * y))) - exp(0.5 * (cos(2 * M_PI * x) + cos(2 * M_PI * y))) + M_E + 20.0;
+    };
+
+    auto ackley_domain = [](vector<double> v)
+    {
+        return (abs(v[0]) <= 5) && (abs(v[1]) <= 5);
+    };
+
+    uniform_real_distribution<> distrib_r(-5, 5);
+    vector<double> ackley_p0 = {
+        distrib_r(gen),
+        distrib_r(gen),
+    };
+    auto result2 = genetic_algorithm(ackley, ackley_domain, ackley_p0, 100000);
+    cout << result2 << " -> " << ackley(result2) << endl;
     return 0;
 }

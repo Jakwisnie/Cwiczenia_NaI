@@ -4,6 +4,7 @@
 #include <list>
 #include <random>
 #include <vector>
+#include "gnuplot-iostream.h"
 
 using namespace std;
 
@@ -81,34 +82,20 @@ vector<double> simulated_annealing(function<double(vector<double>)> f, function<
             s_global_best = s_current;
         }
         //        cout << k << " " << f(s_current) << endl;
-        cout << s_current << " " << f(s_current) << endl;
     }
-
+    
+    cout << s_current << " " << f(s_current) << endl;
     return s_global_best;
 }
 int main()
 {
-    cout << "Ktory algorytm chcesz wykorzystac ? 1 - hill_climbing , 2- " << endl;
+    cout << "Ktory algorytm chcesz wykorzystac ? 1 - hill_climbing , 2 - simulated_annealing" << endl;
     int g;
     cin >> g;
 
     cout << "Ktorą funkcje chcesz wykorzystac ? 1 - ackley , 2- himmelblau" << endl;
     int a;
     cin >> a;
-
-    int b, c;
-
-    while (!(b <= 5 && b >= (-5)))
-    {
-        cout << "Podaj pierwszy argument" << endl;
-        cin >> b;
-    };
-
-    while (!(c <= 5 && c >= (-5)))
-    {
-        cout << "Podaj drugi argument" << endl;
-        cin >> c;
-    };
 
     auto function1 = [](vector<double> v)
     {
@@ -188,16 +175,19 @@ int main()
                     distrib_r(gen),
                 };
                 auto result = simulated_annealing(
-        ackley, ackley_domain, ackley_p0, 10000,
-        [](auto p) {
-            normal_distribution<double> n(0.0, 0.3);
-            for (auto& e : p) {
-                e = e + n(mt_generator);
-            }
-            return p;
-        },
-        [](int k) { return 1000.0 / k; });
-    cout << result << " -> " << ackley(result) << endl;
+                    ackley, ackley_domain, ackley_p0, 10000,
+                    [](auto p)
+                    {
+                        normal_distribution<double> n(0.0, 0.3);
+                        for (auto &e : p)
+                        {
+                            e = e + n(gen);
+                        }
+                        return p;
+                    },
+                    [](int k)
+                    { return 1000.0 / k; });
+                cout << result << " -> " << ackley(result) << endl;
             }
             else
             {
@@ -218,7 +208,19 @@ int main()
                         distrib_r(gen),
                         distrib_r(gen),
                     };
-                    auto result2 = simulated_annealing(himmelblau, himmelblau_domain, himmelblau_p0, 10000);
+                    auto result2 = simulated_annealing(
+                        himmelblau, himmelblau_domain, himmelblau_p0, 10000,
+                        [](auto p)
+                        {
+                            normal_distribution<double> n(0.0, 0.3);
+                            for (auto &e : p)
+                            {
+                                e = e + n(gen);
+                            }
+                            return p;
+                        },
+                        [](int k)
+                        { return 1000.0 / k; });
                     cout << result2 << " -> " << himmelblau(result2) << endl;
                 }
                 else
@@ -231,8 +233,6 @@ int main()
         {
             cout << " zly argument";
         }
-
-       
     }
- return 0;
+    return 0;
 }
