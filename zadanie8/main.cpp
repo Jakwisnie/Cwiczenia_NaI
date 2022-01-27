@@ -8,8 +8,8 @@ using namespace cv;
 
 int main(int argc, char** argv) {
 
-	int loRange[3] = {50, 25, 25};
-	int hiRange[3] = {70, 255,255};
+	int loRange[3] = { 50, 25, 25 };
+	int hiRange[3] = { 70, 255,255 };
 
 
 	VideoCapture camera(0);
@@ -52,7 +52,7 @@ int main(int argc, char** argv) {
 			return contourArea(a, false) > contourArea(b, false);
 		});
 
-		
+
 
 		Point avg[2] = {};
 
@@ -70,6 +70,12 @@ int main(int argc, char** argv) {
 		{
 			line(frame, avg[0], avg[1], Scalar(0, 0, 0), 8);
 			line(frame, avg[1], avg[0], Scalar(80, 200, 130), 2);
+
+			if ((avg[0].y - avg[1].y < 30 && avg[1].y - avg[0].y < 30))
+			{
+				line(frame, avg[0], avg[1], Scalar(0, 0, 0), 8);
+				line(frame, avg[1], avg[0], Scalar(80, 200, 130), 4);
+			}
 		}
 		imshow("contours", frame);
 
